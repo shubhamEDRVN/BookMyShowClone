@@ -1,82 +1,468 @@
+/* ============================================
+   BOOKING SECTION (Home Page)
+   ============================================ */
+
 .container {
-    width: 80%;
-    /* margin-top: 10vh; */
-    margin: 30px auto;
-    padding: 30px 30px 0px 30px;
-    background-color: #f0eaea;
-    border: 1px solid black;
-    border-radius: 5px;
-    color: #fff;
-    box-shadow: 5px 5px 5px rgba(199, 207, 224, 0.699);
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--content-padding);
+  color: var(--color-text-primary);
+}
+
+.container .selection_container {
+  width: 100%;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.select_movie_component {
+  flex-grow: 1;
+}
+
+.BN-btn {
+  padding: 14px 32px;
+  border: none;
+  margin-top: var(--spacing-xl);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  color: white;
+  font-weight: 700;
+  font-family: var(--font-display);
+  background: var(--color-primary);
+  position: relative;
+  transition: all var(--transition-base);
+  letter-spacing: 0.5px;
+  box-shadow: var(--shadow-glow-primary);
+}
+
+.BN-btn:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(230, 57, 70, 0.4);
+}
+
+.BN-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.wrapper {
+  display: flex;
+  flex-grow: 0;
+  overflow: visible;
+  gap: var(--spacing-xl);
+}
+
+.time_seats_container {
+  position: relative;
+  overflow: auto;
+  top: 0;
+}
+
+.SS_wrapper {
+  margin-top: var(--spacing-2xl);
+}
+
+/* Quick Filters */
+.quick-filters {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg) 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.quick-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-filter {
+  flex-shrink: 0;
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.quick-filter:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+}
+
+.quick-filter--active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Coming Soon Section */
+.coming-soon-scroll {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-md);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.coming-soon-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.coming-soon-card {
+  flex-shrink: 0;
+  width: 200px;
+  background: var(--color-surface-1);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-base);
+}
+
+@media (min-width: 768px) {
+  .coming-soon-card {
+    width: 220px;
   }
-  
-  .container .selection_container {
-    width: 100%;
+}
+
+.coming-soon-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-hover);
+}
+
+.coming-soon-card__poster {
+  aspect-ratio: 2/3;
+  overflow: hidden;
+}
+
+.coming-soon-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.coming-soon-card:hover .coming-soon-card__img {
+  transform: scale(1.05);
+}
+
+.coming-soon-card__info {
+  padding: var(--spacing-md);
+}
+
+.coming-soon-card__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.coming-soon-card__genre {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.coming-soon-card__countdown {
+  font-size: var(--font-size-xs);
+  color: var(--color-gold);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.coming-soon-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.coming-soon-card__interest {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+.coming-soon-card__notify {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--color-surface-3);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.coming-soon-card__notify:hover,
+.coming-soon-card__notify--active {
+  background: rgba(230, 57, 70, 0.15);
+  color: var(--color-primary);
+  border-color: rgba(230, 57, 70, 0.3);
+}
+
+/* Events Section */
+.events-tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.events-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.events-tab {
+  flex-shrink: 0;
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.events-tab:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-border-hover);
+}
+
+.events-tab--active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 640px) {
+  .events-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .select_movie_component{
-    flex-grow: 1;
+}
+
+@media (min-width: 1024px) {
+  .events-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
-  
-  .BN-btn{
-    padding: 10px;
-    border: none;
-    margin-top: 20px;
-    left: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 25px;
-    color: rgb(5, 5, 5);
-    font-weight: bold;
-    background-color: rgb(238, 239, 241);
-    border: 2px solid rgb(10, 10, 10) ;
-    position: relative;
+}
+
+.event-card {
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-border-hover);
+}
+
+.event-card__poster {
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+
+.event-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.event-card:hover .event-card__img {
+  transform: scale(1.05);
+}
+
+.event-card__info {
+  padding: var(--spacing-md);
+}
+
+.event-card__category {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--color-purple);
+  margin-bottom: 8px;
+}
+
+.event-card__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.event-card__venue {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.event-card__date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.event-card__price {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-teal);
+}
+
+/* Offers Section */
+.offers-scroll {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-md);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.offers-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.offer-card {
+  flex-shrink: 0;
+  width: 280px;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  transition: all var(--transition-base);
+}
+
+@media (min-width: 768px) {
+  .offer-card {
+    width: 300px;
   }
-  
-  .BN-btn:hover{
-    background-color: rgba(255, 0, 55, 0.664);
-    color: #fff;
-  }
-  
-  .wrapper{
-    display: flex;
-    flex-grow: 0;
-    overflow:visible;
-  }
-  .time_seats_container{
-    position: relative;
-    overflow: auto;
-    top: -10px;
-  }
-  .SS_wrapper{
-    margin-top: 50px;
-  }
-  
-  @media screen and (max-width: 1300px) {
-   .wrapper{
+}
+
+.offer-card:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.offer-card__bank {
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-gold);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.offer-card__headline {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.offer-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--spacing-md);
+}
+
+.offer-card__code {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border: 1px dashed var(--color-text-muted);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: transparent;
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.offer-card__code:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.offer-card__terms {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+@media screen and (max-width: 1300px) {
+  .wrapper {
     flex-direction: column-reverse;
-   } 
-   
-  .time_seats_container{
-    top: 0px;
   }
-   .last_booking_details_container{
-    margin-bottom: 20px;
-   }
+
+  .time_seats_container {
+    top: 0;
   }
-  
-  @media screen and (max-width: 500px) {
-    .container{
-      width: 85%;
-      padding: 15px;
-    }
-     .SM_main_container{
-      display: grid;
-     }
-     .TS_main_container{
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-     
-      
-     }
+
+  .last_booking_details_container {
+    margin-bottom: var(--spacing-lg);
   }
+}
+
+@media screen and (max-width: 500px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+
+  .container .selection_container {
+    padding: var(--spacing-md);
+  }
+
+  .SM_main_container {
+    display: grid;
+  }
+
+  .TS_main_container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}

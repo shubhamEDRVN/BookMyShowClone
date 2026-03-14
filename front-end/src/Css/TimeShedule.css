@@ -1,14 +1,16 @@
 .TS_heading {
-    width: 100%;
-    font-size: 22px;
-    color: black
-    ;
-  }
-  
-  .TS_main_container {
-    display: flex;
-    margin-bottom: 20px;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    color: black;
-  }
+  width: 100%;
+  font-size: var(--font-size-xl);
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.TS_main_container {
+  display: flex;
+  margin-bottom: var(--spacing-lg);
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  color: var(--color-text-primary);
+}
