@@ -59,7 +59,13 @@ const Home = () => {
 
   // Copy offer code
   const copyCode = (code) => {
-    navigator.clipboard.writeText(code).catch(() => {});
+    navigator.clipboard.writeText(code).then(() => {
+      setErrorPopup(true);
+      setErrorMessage("Code " + code + " copied!");
+    }).catch(() => {
+      setErrorPopup(true);
+      setErrorMessage("Failed to copy code. Please copy manually: " + code);
+    });
   };
 
   // Validation functions
