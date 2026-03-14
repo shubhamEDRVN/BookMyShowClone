@@ -2,7 +2,7 @@ const { getRedisClient } = require('../config/redis');
 const Show = require('../models/Show');
 const ApiError = require('../utils/ApiError');
 
-const LOCK_TTL = 600; // 10 minutes
+const LOCK_TTL_SECONDS = 600; // 10 minutes
 
 /**
  * Lock seats atomically using Redis MULTI/EXEC
@@ -30,22 +30,30 @@ const lockSeats = async (showId, seatIds, userId) => {
     return lockSeatsInMongo(showId, seatIds, userId);
   }
 
-  // Check Redis locks
-  for (const seatId of seatIds) {
-    const lockKey = `lock:${showId}:${seatId}`;
-    const existingLock = await redis.get(lockKey);
-    if (existingLock && existingLock !== userId) {
-      throw new ApiError(409, `Seat ${seatId} is temporarily held by another user`);
-    }
-  }
+  // Use Lua script for atomic check-and-set to prevent race conditions
+  const luaScript = `
+    for i, key in ipairs(KEYS) do
+      local existing = redis.call('GET', key)
+      if existing and existing ~= ARGV[1] then
+        return key
+      end
+    end
+    for i, key in ipairs(KEYS) do
+      redis.call('SET', key, ARGV[1], 'EX', ARGV[2])
+    end
+    return nil
+  `;
 
-  // Atomic lock using MULTI/EXEC
-  const multi = redis.multi();
-  for (const seatId of seatIds) {
-    const lockKey = `lock:${showId}:${seatId}`;
-    multi.set(lockKey, userId, { EX: LOCK_TTL });
+  const keys = seatIds.map((seatId) => `lock:${showId}:${seatId}`);
+  const conflictKey = await redis.eval(luaScript, {
+    keys,
+    arguments: [userId, String(LOCK_TTL_SECONDS)],
+  });
+
+  if (conflictKey) {
+    const conflictSeat = conflictKey.split(':').pop();
+    throw new ApiError(409, `Seat ${conflictSeat} is temporarily held by another user`);
   }
-  await multi.exec();
 
   return true;
 };
@@ -55,7 +63,7 @@ const lockSeats = async (showId, seatIds, userId) => {
  */
 const lockSeatsInMongo = async (showId, seatIds, userId) => {
   const now = new Date();
-  const tenMinutesAgo = new Date(now.getTime() - LOCK_TTL * 1000);
+  const tenMinutesAgo = new Date(now.getTime() - LOCK_TTL_SECONDS * 1000);
 
   const show = await Show.findById(showId);
 
@@ -132,7 +140,7 @@ const getSeatStatus = async (showId) => {
     lockedSeatIds = keys.map((key) => key.split(':').pop());
   } else {
     // Fallback to MongoDB locks
-    const tenMinutesAgo = new Date(Date.now() - LOCK_TTL * 1000);
+    const tenMinutesAgo = new Date(Date.now() - LOCK_TTL_SECONDS * 1000);
     lockedSeatIds = show.lockedSeats
       .filter((lock) => lock.lockedAt > tenMinutesAgo)
       .map((lock) => lock.seatId);

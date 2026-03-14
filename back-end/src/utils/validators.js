@@ -37,7 +37,7 @@ const movieSchema = Joi.object({
   description: Joi.string().optional(),
   posterUrl: Joi.string().uri().optional(),
   backdropUrl: Joi.string().uri().optional(),
-  trailerUrl: Joi.string().optional(),
+  trailerUrl: Joi.string().uri().optional(),
   genres: Joi.array().items(Joi.string()).optional(),
   languages: Joi.array().items(Joi.string()).optional(),
   formats: Joi.array().items(Joi.string().valid('2D', '3D', 'IMAX', '4DX', 'IMAX 3D')).optional(),

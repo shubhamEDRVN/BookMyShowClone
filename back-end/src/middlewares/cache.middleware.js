@@ -21,7 +21,9 @@ const cacheMiddleware = (keyPrefix, ttl = 300) => async (req, res, next) => {
     const originalJson = res.json.bind(res);
     res.json = (data) => {
       if (res.statusCode >= 200 && res.statusCode < 300) {
-        redis.setEx(key, ttl, JSON.stringify(data)).catch(() => {});
+        redis.setEx(key, ttl, JSON.stringify(data)).catch((err) => {
+          console.error('Cache write failed:', err.message);
+        });
       }
       return originalJson(data);
     };

@@ -9,6 +9,8 @@ const { sendVerificationEmail, sendPasswordResetEmail } = require('../services/e
 const { sendOTP, generateOTP } = require('../services/sms.service');
 const { getRedisClient } = require('../config/redis');
 
+const PASSWORD_RESET_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+
 /**
  * POST /api/v1/auth/register
  * Register a new user and send verification email
@@ -177,7 +179,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   const resetToken = crypto.randomBytes(32).toString('hex');
   user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  user.passwordResetExpires = new Date(Date.now() + PASSWORD_RESET_EXPIRY_MS);
   await user.save({ validateBeforeSave: false });
 
   sendPasswordResetEmail(email, user.name, resetToken).catch((err) =>

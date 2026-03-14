@@ -9,7 +9,7 @@ const { lockSeats, unlockSeats } = require('../services/seat.service');
 const { createOrder, verifySignature } = require('../services/payment.service');
 const { sendBookingConfirmationEmail } = require('../services/email.service');
 
-const CONVENIENCE_FEE_PERCENT = 1.18; // 18% GST on convenience fee base
+const CONVENIENCE_FEE_GST_MULTIPLIER = 1.18; // Base fee + 18% GST
 
 /**
  * POST /api/v1/bookings/initiate
@@ -28,12 +28,17 @@ const initiateBooking = asyncHandler(async (req, res) => {
   const seatIds = seats.map((s) => s.seatId);
   await lockSeats(showId, seatIds, userId.toString());
 
-  // Calculate amounts
-  const seatTotal = seats.reduce((sum, s) => sum + s.price, 0);
-  const foodTotal = foodItems.reduce((sum, f) => sum + f.price * f.quantity, 0);
+  // Calculate amounts using integer arithmetic (paise) to avoid floating-point errors
+  const seatTotal = seats.reduce((sum, s) => sum + Math.round(s.price * 100), 0);
+  const foodTotal = foodItems.reduce((sum, f) => sum + Math.round(f.price * 100) * f.quantity, 0);
   const totalAmount = seatTotal + foodTotal;
-  const convenienceFee = Math.round(seatTotal * 0.028 * CONVENIENCE_FEE_PERCENT);
+  const convenienceFee = Math.round(seatTotal * 0.028 * CONVENIENCE_FEE_GST_MULTIPLIER);
   const payableAmount = totalAmount + convenienceFee;
+
+  // Convert back to rupees for storage
+  const totalAmountRupees = totalAmount / 100;
+  const convenienceFeeRupees = convenienceFee / 100;
+  const payableAmountRupees = payableAmount / 100;
 
   // Create booking
   const booking = await Booking.create({
@@ -43,10 +48,10 @@ const initiateBooking = asyncHandler(async (req, res) => {
     theatre: show.theatre,
     seats,
     foodItems,
-    totalAmount,
-    convenienceFee,
+    totalAmount: totalAmountRupees,
+    convenienceFee: convenienceFeeRupees,
     offerCode,
-    payableAmount,
+    payableAmount: payableAmountRupees,
     status: 'pending',
     paymentStatus: 'pending',
   });
@@ -54,7 +59,7 @@ const initiateBooking = asyncHandler(async (req, res) => {
   // Create Razorpay order
   let razorpayOrder;
   try {
-    razorpayOrder = await createOrder(payableAmount, booking.bookingId);
+    razorpayOrder = await createOrder(payableAmountRupees, booking.bookingId);
     booking.razorpayOrderId = razorpayOrder.id;
     await booking.save();
   } catch (error) {

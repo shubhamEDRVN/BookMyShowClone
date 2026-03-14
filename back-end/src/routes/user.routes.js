@@ -15,7 +15,7 @@ const {
 const { authenticate } = require('../middlewares/auth.middleware');
 const { validate, updateProfileSchema, changePasswordSchema } = require('../utils/validators');
 
-const upload = multer({ dest: '/tmp/uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authenticate);
 

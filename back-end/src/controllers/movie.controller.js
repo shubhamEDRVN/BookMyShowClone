@@ -259,11 +259,19 @@ const toggleInterested = asyncHandler(async (req, res) => {
   const movie = await Movie.findById(req.params.id);
   if (!movie) throw new ApiError(404, 'Movie not found');
 
-  // Simple toggle: increment/decrement
-  movie.interestedCount = (movie.interestedCount || 0) + 1;
+  const userId = req.user._id;
+  const isInWishlist = req.user.wishlist && req.user.wishlist.some(
+    (id) => id.toString() === movie._id.toString()
+  );
+
+  if (isInWishlist) {
+    movie.interestedCount = Math.max(0, (movie.interestedCount || 0) - 1);
+  } else {
+    movie.interestedCount = (movie.interestedCount || 0) + 1;
+  }
   await movie.save();
 
-  res.json(new ApiResponse(200, { interestedCount: movie.interestedCount }, 'Interest toggled'));
+  res.json(new ApiResponse(200, { interestedCount: movie.interestedCount, interested: !isInWishlist }, 'Interest toggled'));
 });
 
 /**

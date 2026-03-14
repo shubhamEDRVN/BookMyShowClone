@@ -156,10 +156,15 @@ const uploadAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, 'Image file is required');
   }
 
-  const result = await cloudinary.uploader.upload(req.file.path, {
-    folder: 'bookmyshow/avatars',
-    width: 300,
-    crop: 'scale',
+  const result = await new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'bookmyshow/avatars', width: 300, crop: 'scale' },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    stream.end(req.file.buffer);
   });
 
   const user = await User.findByIdAndUpdate(
