@@ -6,6 +6,8 @@ const ApiError = require('../utils/ApiError');
 const ApiResponse = require('../utils/ApiResponse');
 const asyncHandler = require('../utils/asyncHandler');
 
+const TRENDING_WINDOW_DAYS = 7;
+
 /**
  * GET /api/v1/movies
  * List movies with filters
@@ -94,7 +96,7 @@ const getComingSoon = asyncHandler(async (req, res) => {
  * Trending by booking count (cached 1hr)
  */
 const getTrending = asyncHandler(async (req, res) => {
-  const recentDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const recentDate = new Date(Date.now() - TRENDING_WINDOW_DAYS * 24 * 60 * 60 * 1000);
 
   const trending = await Booking.aggregate([
     { $match: { status: 'confirmed', createdAt: { $gte: recentDate } } },

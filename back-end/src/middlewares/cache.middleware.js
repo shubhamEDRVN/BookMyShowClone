@@ -1,11 +1,13 @@
 const { getRedisClient } = require('../config/redis');
 
+const DEFAULT_CACHE_TTL_SECONDS = 300; // 5 minutes
+
 /**
  * Redis cache middleware factory
  * @param {string} keyPrefix - Cache key prefix
  * @param {number} ttl - Time to live in seconds
  */
-const cacheMiddleware = (keyPrefix, ttl = 300) => async (req, res, next) => {
+const cacheMiddleware = (keyPrefix, ttl = DEFAULT_CACHE_TTL_SECONDS) => async (req, res, next) => {
   const redis = getRedisClient();
   if (!redis || !redis.isReady) return next();
 

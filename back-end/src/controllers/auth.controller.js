@@ -10,6 +10,7 @@ const { sendOTP, generateOTP } = require('../services/sms.service');
 const { getRedisClient } = require('../config/redis');
 
 const PASSWORD_RESET_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+const OTP_TTL_SECONDS = 300; // 5 minutes
 
 /**
  * POST /api/v1/auth/register
@@ -232,7 +233,7 @@ const sendOTPHandler = asyncHandler(async (req, res) => {
   // Store OTP in Redis with 5-minute TTL
   const redis = getRedisClient();
   if (redis && redis.isReady) {
-    await redis.setEx(`otp:${phone}`, 300, otp);
+    await redis.setEx(`otp:${phone}`, OTP_TTL_SECONDS, otp);
   }
 
   await sendOTP(phone, otp);

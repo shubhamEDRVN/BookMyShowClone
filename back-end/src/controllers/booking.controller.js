@@ -10,6 +10,8 @@ const { createOrder, verifySignature } = require('../services/payment.service');
 const { sendBookingConfirmationEmail } = require('../services/email.service');
 
 const CONVENIENCE_FEE_GST_MULTIPLIER = 1.18; // Base fee + 18% GST
+const CONVENIENCE_FEE_RATE = 0.028; // 2.8% of seat total
+const LOYALTY_POINTS_PER_UNIT = 100; // ₹100 spent = 1 point
 
 /**
  * POST /api/v1/bookings/initiate
@@ -32,7 +34,7 @@ const initiateBooking = asyncHandler(async (req, res) => {
   const seatTotal = seats.reduce((sum, s) => sum + Math.round(s.price * 100), 0);
   const foodTotal = foodItems.reduce((sum, f) => sum + Math.round(f.price * 100) * f.quantity, 0);
   const totalAmount = seatTotal + foodTotal;
-  const convenienceFee = Math.round(seatTotal * 0.028 * CONVENIENCE_FEE_GST_MULTIPLIER);
+  const convenienceFee = Math.round(seatTotal * CONVENIENCE_FEE_RATE * CONVENIENCE_FEE_GST_MULTIPLIER);
   const payableAmount = totalAmount + convenienceFee;
 
   // Convert back to rupees for storage
@@ -124,8 +126,8 @@ const confirmBooking = asyncHandler(async (req, res) => {
   // Release Redis locks
   await unlockSeats(booking.show.toString(), seatIds, booking.user.toString());
 
-  // Award loyalty points (₹100 spent = 1 point)
-  const pointsEarned = Math.floor(booking.payableAmount / 100);
+  // Award loyalty points
+  const pointsEarned = Math.floor(booking.payableAmount / LOYALTY_POINTS_PER_UNIT);
   if (pointsEarned > 0) {
     await User.findByIdAndUpdate(booking.user, {
       $inc: { loyaltyPoints: pointsEarned },

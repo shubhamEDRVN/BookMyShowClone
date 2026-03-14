@@ -1,14 +1,26 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT, 10) || 587,
-  secure: false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+let transporter = null;
+
+const getTransporter = () => {
+  if (transporter) return transporter;
+
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('SMTP credentials not configured — emails will not be sent');
+    return null;
+  }
+
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT, 10) || 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+  return transporter;
+};
 
 /**
  * Send email verification link
@@ -17,8 +29,10 @@ const transporter = nodemailer.createTransport({
  * @param {string} token - Verification token
  */
 const sendVerificationEmail = async (to, name, token) => {
+  const mailer = getTransporter();
+  if (!mailer) return;
   const verifyUrl = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
-  await transporter.sendMail({
+  await mailer.sendMail({
     from: `"BookMyShow" <${process.env.SMTP_USER}>`,
     to,
     subject: 'Verify Your Email - BookMyShow',
@@ -40,8 +54,10 @@ const sendVerificationEmail = async (to, name, token) => {
  * @param {string} token - Reset token
  */
 const sendPasswordResetEmail = async (to, name, token) => {
+  const mailer = getTransporter();
+  if (!mailer) return;
   const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
-  await transporter.sendMail({
+  await mailer.sendMail({
     from: `"BookMyShow" <${process.env.SMTP_USER}>`,
     to,
     subject: 'Reset Your Password - BookMyShow',
@@ -62,7 +78,9 @@ const sendPasswordResetEmail = async (to, name, token) => {
  * @param {Object} booking - Booking details
  */
 const sendBookingConfirmationEmail = async (to, booking) => {
-  await transporter.sendMail({
+  const mailer = getTransporter();
+  if (!mailer) return;
+  await mailer.sendMail({
     from: `"BookMyShow" <${process.env.SMTP_USER}>`,
     to,
     subject: `Booking Confirmed - ${booking.bookingId}`,
